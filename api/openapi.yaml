@@ -1,0 +1,536 @@
+openapi: 3.0.3
+info:
+  description: |-
+    At Unstructured, we're on a mission to give organizations access to all of their data. We know the world runs on documents—from research reports and memos, to quarterly filings and plans of action, documents are the unit of information that companies depend on. And yet, 80% of this information is trapped in inaccessible formats, and businesses have long struggled to unlock this data, leading to information silos, inefficient decision-making, and repetitive work. Until now.
+
+    Unstructured captures this unstructured data wherever it lives and transforms it into AI-friendly JSON files for companies who are eager to fold AI into their business.
+  title: Unstructured Pipeline API
+  version: 0.0.1
+  x-konfig-has-globally-required-security: true
+  x-konfig-uses-multipart-form-data: true
+servers:
+- description: Hosted API
+  url: https://api.unstructured.io
+  x-speakeasy-server-id: prod
+- description: Development server
+  url: http://localhost:8000
+  x-speakeasy-server-id: local
+security:
+- ApiKeyAuth: []
+tags:
+- name: general
+paths:
+  /general/v0/general:
+    post:
+      operationId: General_createPipeline
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/partition_parameters'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Elements'
+          description: Successful Response
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+          x-do-not-generate: true
+      summary: Pipeline 1
+      tags:
+      - general
+      x-speakeasy-name-override: partition
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--general-v0-general
+      x-content-type: multipart/form-data
+      x-accepts: application/json
+components:
+  schemas:
+    Elements:
+      items: {}
+      type: array
+      x-konfig-is-used-in-successful-response: true
+    partition_parameters:
+      properties:
+        files:
+          description: The file to extract
+          example: !!binary |-
+            eyJzdW1tYXJ5IjoiRmlsZSB0byBiZSBwYXJ0aXRpb25lZCIsImV4dGVybmFsVmFsdWUiOiJodHRw
+            czovL2dpdGh1Yi5jb20vVW5zdHJ1Y3R1cmVkLUlPL3Vuc3RydWN0dXJlZC9ibG9iLzk4ZDM1NDE5
+            MDlmNjQyOTBiNWVmYjY1YTIyNmZjM2VlOGE3Y2M1ZWUvZXhhbXBsZS1kb2NzL2xheW91dC1wYXJz
+            ZXItcGFwZXIucGRmIn0=
+          format: binary
+          type: string
+          x-konfig-original-example:
+            summary: File to be partitioned
+            externalValue: https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-files
+        strategy:
+          description: "The strategy to use for partitioning PDF/image. Options are\
+            \ fast, hi_res, auto. Default: auto"
+          example: hi_res
+          title: Strategy
+          type: string
+          x-konfig-original-example: hi_res
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-strategy
+        gz_uncompressed_content_type:
+          description: "If file is gzipped, use this content type after unzipping"
+          example: application/pdf
+          title: Uncompressed Content Type
+          type: string
+          x-konfig-original-example: application/pdf
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-gz_uncompressed_content_type
+        output_format:
+          description: "The format of the response. Supported formats are application/json\
+            \ and text/csv. Default: application/json."
+          example: application/json
+          title: Output Format
+          type: string
+          x-konfig-original-example: application/json
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-output_format
+        coordinates:
+          description: "If true, return coordinates for each element. Default: false"
+          title: Coordinates
+          type: boolean
+        encoding:
+          description: "The encoding method used to decode the text input. Default:\
+            \ utf-8"
+          example: utf-8
+          title: Encoding
+          type: string
+          x-konfig-original-example: utf-8
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-encoding
+        hi_res_model_name:
+          description: The name of the inference model used when strategy is hi_res
+          example: yolox
+          title: Hi Res Model Name
+          type: string
+          x-konfig-original-example: yolox
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-hi_res_model_name
+        include_page_breaks:
+          description: "If True, the output will include page breaks if the filetype\
+            \ supports it. Default: false"
+          title: Include Page Breaks
+          type: boolean
+        languages:
+          default: []
+          description: "The languages present in the document, for use in partitioning\
+            \ and/or OCR"
+          example: "[eng]"
+          items:
+            example: eng
+            type: string
+            x-konfig-original-example: eng
+            x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-languages-items
+          title: OCR Languages
+          type: array
+          x-konfig-original-example: "[eng]"
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-languages
+        pdf_infer_table_structure:
+          description: "If True and strategy=hi_res, any Table Elements extracted\
+            \ from a PDF will include an additional metadata field, 'text_as_html',\
+            \ where the value (string) is a just a transformation of the data into\
+            \ an HTML <table>."
+          title: Pdf Infer Table Structure
+          type: boolean
+        skip_infer_table_types:
+          description: "The document types that you want to skip table extraction\
+            \ with. Default: ['pdf', 'jpg', 'png']"
+          items:
+            example: pdf
+            type: string
+            x-konfig-original-example: pdf
+            x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-skip_infer_table_types-items
+          title: Skip Infer Table Types
+          type: array
+        xml_keep_tags:
+          description: "If True, will retain the XML tags in the output. Otherwise\
+            \ it will simply extract the text from within the tags. Only applies to\
+            \ partition_xml."
+          title: Xml Keep Tags
+          type: boolean
+        chunking_strategy:
+          description: "Use one of the supported strategies to chunk the returned\
+            \ elements. Currently supports: by_title"
+          example: by_title
+          title: Chunking Strategy
+          type: string
+          x-konfig-original-example: by_title
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-chunking_strategy
+        multipage_sections:
+          description: "If chunking strategy is set, determines if sections can span\
+            \ multiple sections. Default: true"
+          title: Multipage Sections
+          type: boolean
+        combine_under_n_chars:
+          description: "If chunking strategy is set, combine elements until a section\
+            \ reaches a length of n chars. Default: 500"
+          example: 500
+          title: Combine Under N Chars
+          type: integer
+          x-konfig-original-example: 500
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-combine_under_n_chars
+        new_after_n_chars:
+          description: "If chunking strategy is set, cut off new sections after reaching\
+            \ a length of n chars (soft max). Default: 1500"
+          example: 1500
+          title: New after n chars
+          type: integer
+          x-konfig-original-example: 1500
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-new_after_n_chars
+        max_characters:
+          description: "If chunking strategy is set, cut off new sections after reaching\
+            \ a length of n chars (hard max). Default: 1500"
+          example: 1500
+          title: Max Characters
+          type: integer
+          x-konfig-original-example: 1500
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-max_characters
+        overlap:
+          description: "A prefix of this many trailing characters from prior text-split\
+            \ chunk is applied to second and later chunks formed from oversized elements\
+            \ by text-splitting. Default: None"
+          example: 25
+          title: Intra-chunk overlap
+          type: integer
+          x-konfig-original-example: 25
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-overlap
+        overlap_all:
+          description: "When True, overlap is also applied to 'normal' chunks formed\
+            \ by combining whole elements. Use with caution as this can introduce\
+            \ noise into otherwise clean semantic units. Default: None"
+          example: true
+          title: Inter-chunk overlap
+          type: boolean
+          x-konfig-original-example: true
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-overlap_all
+        extract_image_block_types:
+          default: []
+          description: "The types of elements to extract, for use in extracting image\
+            \ blocks as base64 encoded data stored in metadata fields"
+          example:
+          - image
+          - table
+          items:
+            example: image
+            type: string
+            x-konfig-original-example: image
+            x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-extract_image_block_types-items
+          title: Image block types to extract
+          type: array
+          x-konfig-original-example:
+          - image
+          - table
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-extract_image_block_types
+      title: Partition Parameters
+      type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    ValidationError:
+      properties:
+        loc:
+          items: {}
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    konfig-generated-schema-components-schemas-partition_parameters-properties-files:
+      example:
+        summary: File to be partitioned
+        externalValue: https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf
+      properties:
+        summary:
+          example: File to be partitioned
+          type: string
+        externalValue:
+          example: https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf
+          type: string
+      type: object
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-strategy:
+      example: hi_res
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-gz_uncompressed_content_type:
+      example: application/pdf
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-output_format:
+      example: application/json
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-encoding:
+      example: utf-8
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-hi_res_model_name:
+      example: yolox
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-languages:
+      example: "[eng]"
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-languages-items:
+      example: eng
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-skip_infer_table_types-items:
+      example: pdf
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-chunking_strategy:
+      example: by_title
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-combine_under_n_chars:
+      example: 500
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-new_after_n_chars:
+      example: 1500
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-max_characters:
+      example: 1500
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-overlap:
+      example: 25
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-overlap_all:
+      example: true
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-extract_image_block_types:
+      example:
+      - image
+      - table
+      items:
+        example: image
+        type: string
+      type: array
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-partition_parameters-properties-extract_image_block_types-items:
+      example: image
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-single-parameter-schema-post--general-v0-general:
+      properties:
+        files:
+          description: The file to extract
+          example: !!binary |-
+            eyJzdW1tYXJ5IjoiRmlsZSB0byBiZSBwYXJ0aXRpb25lZCIsImV4dGVybmFsVmFsdWUiOiJodHRw
+            czovL2dpdGh1Yi5jb20vVW5zdHJ1Y3R1cmVkLUlPL3Vuc3RydWN0dXJlZC9ibG9iLzk4ZDM1NDE5
+            MDlmNjQyOTBiNWVmYjY1YTIyNmZjM2VlOGE3Y2M1ZWUvZXhhbXBsZS1kb2NzL2xheW91dC1wYXJz
+            ZXItcGFwZXIucGRmIn0=
+          format: binary
+          type: string
+          x-konfig-original-example:
+            summary: File to be partitioned
+            externalValue: https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-files
+        strategy:
+          description: "The strategy to use for partitioning PDF/image. Options are\
+            \ fast, hi_res, auto. Default: auto"
+          example: hi_res
+          title: Strategy
+          type: string
+          x-konfig-original-example: hi_res
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-strategy
+        gz_uncompressed_content_type:
+          description: "If file is gzipped, use this content type after unzipping"
+          example: application/pdf
+          title: Uncompressed Content Type
+          type: string
+          x-konfig-original-example: application/pdf
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-gz_uncompressed_content_type
+        output_format:
+          description: "The format of the response. Supported formats are application/json\
+            \ and text/csv. Default: application/json."
+          example: application/json
+          title: Output Format
+          type: string
+          x-konfig-original-example: application/json
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-output_format
+        coordinates:
+          description: "If true, return coordinates for each element. Default: false"
+          title: Coordinates
+          type: boolean
+        encoding:
+          description: "The encoding method used to decode the text input. Default:\
+            \ utf-8"
+          example: utf-8
+          title: Encoding
+          type: string
+          x-konfig-original-example: utf-8
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-encoding
+        hi_res_model_name:
+          description: The name of the inference model used when strategy is hi_res
+          example: yolox
+          title: Hi Res Model Name
+          type: string
+          x-konfig-original-example: yolox
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-hi_res_model_name
+        include_page_breaks:
+          description: "If True, the output will include page breaks if the filetype\
+            \ supports it. Default: false"
+          title: Include Page Breaks
+          type: boolean
+        languages:
+          default: []
+          description: "The languages present in the document, for use in partitioning\
+            \ and/or OCR"
+          example: "[eng]"
+          items:
+            example: eng
+            type: string
+            x-konfig-original-example: eng
+            x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-languages-items
+          title: OCR Languages
+          type: array
+          x-konfig-original-example: "[eng]"
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-languages
+        pdf_infer_table_structure:
+          description: "If True and strategy=hi_res, any Table Elements extracted\
+            \ from a PDF will include an additional metadata field, 'text_as_html',\
+            \ where the value (string) is a just a transformation of the data into\
+            \ an HTML <table>."
+          title: Pdf Infer Table Structure
+          type: boolean
+        skip_infer_table_types:
+          description: "The document types that you want to skip table extraction\
+            \ with. Default: ['pdf', 'jpg', 'png']"
+          items:
+            example: pdf
+            type: string
+            x-konfig-original-example: pdf
+            x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-skip_infer_table_types-items
+          title: Skip Infer Table Types
+          type: array
+        xml_keep_tags:
+          description: "If True, will retain the XML tags in the output. Otherwise\
+            \ it will simply extract the text from within the tags. Only applies to\
+            \ partition_xml."
+          title: Xml Keep Tags
+          type: boolean
+        chunking_strategy:
+          description: "Use one of the supported strategies to chunk the returned\
+            \ elements. Currently supports: by_title"
+          example: by_title
+          title: Chunking Strategy
+          type: string
+          x-konfig-original-example: by_title
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-chunking_strategy
+        multipage_sections:
+          description: "If chunking strategy is set, determines if sections can span\
+            \ multiple sections. Default: true"
+          title: Multipage Sections
+          type: boolean
+        combine_under_n_chars:
+          description: "If chunking strategy is set, combine elements until a section\
+            \ reaches a length of n chars. Default: 500"
+          example: 500
+          title: Combine Under N Chars
+          type: integer
+          x-konfig-original-example: 500
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-combine_under_n_chars
+        new_after_n_chars:
+          description: "If chunking strategy is set, cut off new sections after reaching\
+            \ a length of n chars (soft max). Default: 1500"
+          example: 1500
+          title: New after n chars
+          type: integer
+          x-konfig-original-example: 1500
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-new_after_n_chars
+        max_characters:
+          description: "If chunking strategy is set, cut off new sections after reaching\
+            \ a length of n chars (hard max). Default: 1500"
+          example: 1500
+          title: Max Characters
+          type: integer
+          x-konfig-original-example: 1500
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-max_characters
+        overlap:
+          description: "A prefix of this many trailing characters from prior text-split\
+            \ chunk is applied to second and later chunks formed from oversized elements\
+            \ by text-splitting. Default: None"
+          example: 25
+          title: Intra-chunk overlap
+          type: integer
+          x-konfig-original-example: 25
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-overlap
+        overlap_all:
+          description: "When True, overlap is also applied to 'normal' chunks formed\
+            \ by combining whole elements. Use with caution as this can introduce\
+            \ noise into otherwise clean semantic units. Default: None"
+          example: true
+          title: Inter-chunk overlap
+          type: boolean
+          x-konfig-original-example: true
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-overlap_all
+        extract_image_block_types:
+          default: []
+          description: "The types of elements to extract, for use in extracting image\
+            \ blocks as base64 encoded data stored in metadata fields"
+          example:
+          - image
+          - table
+          items:
+            example: image
+            type: string
+            x-konfig-original-example: image
+            x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-extract_image_block_types-items
+          title: Image block types to extract
+          type: array
+          x-konfig-original-example:
+          - image
+          - table
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-partition_parameters-properties-extract_image_block_types
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+  securitySchemes:
+    ApiKeyAuth:
+      in: header
+      name: unstructured-api-key
+      type: apiKey
+      x-speakeasy-example: YOUR_API_KEY
+      x-konfig-globally-required-security: true
+x-speakeasy-retries:
+  strategy: backoff
+  backoff:
+    initialInterval: 500
+    maxInterval: 60000
+    maxElapsedTime: 900000
+    exponent: 1.5
+  statusCodes:
+  - 5xx
+  retryConnectionErrors: true
+
